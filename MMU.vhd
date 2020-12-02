@@ -39,7 +39,7 @@ BEGIN
  ---- FSM stuff:
 
 --- INIT MODE
-  PROCESS(current_state, hard_reset, reset, ld_w)
+  PROCESS(current_state, hard_reset, reset, ld_w, ld, stall)
   BEGIN
     IF (hard_reset = '1' OR reset = '1') THEN
         next_state <= idle;
