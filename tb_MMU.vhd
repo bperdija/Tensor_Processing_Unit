@@ -48,12 +48,13 @@ END COMPONENT;
     tb_a2 <= "00000000";
     wait for 20 ns;
 
+	  tb_stall <= '1';
     tb_w0 <= "00000010";
     tb_w1 <= "00000101";
     tb_w2 <= "00001000";
     wait for 20 ns;
 
-
+	  tb_stall <= '0';
     tb_w0 <= "00000011";
     tb_w1 <= "00000110";
     tb_w2 <= "00001001";
@@ -84,6 +85,13 @@ END COMPONENT;
     tb_a2 <= "00001000";
     wait for 20 ns;
 
+	 tb_stall <= '1';
+    tb_a0 <= "00000000";
+    tb_a1 <= "00000110";
+    tb_a2 <= "00001000";
+    wait for 20 ns;
+
+	 tb_stall <= '0';
     tb_a0 <= "00000000";
     tb_a1 <= "00000000";
     tb_a2 <= "00001001";
@@ -93,10 +101,6 @@ END COMPONENT;
     tb_a1 <= "00000000";
     tb_a2 <= "00000000";
     wait for 80 ns;
-
-
-    -- all output now
-
 
     END PROCESS;
 END test;
