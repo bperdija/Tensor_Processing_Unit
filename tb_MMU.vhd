@@ -12,7 +12,8 @@ COMPONENT MMU is
   PORT(clk, reset, hard_reset, ld, ld_w, stall  	  : IN STD_LOGIC;
        a0, a1, a2                                   : IN UNSIGNED(7 DOWNTO 0);
        w0, w1, w2                                   : IN UNSIGNED(7 DOWNTO 0);
-  	   y0, y1, y2 				                          : OUT UNSIGNED(7 DOWNTO 0));
+  	   y0, y1, y2 				                          : OUT UNSIGNED(7 DOWNTO 0);
+       collect_matrix                               : OUT STD_LOGIC);
 END COMPONENT;
 
   CONSTANT HALF_PERIOD                                         : time := 10 ns;
@@ -20,11 +21,12 @@ END COMPONENT;
   SIGNAL tb_hard_reset, tb_reset, tb_ld, tb_ld_w, tb_stall     : std_logic;
   SIGNAL tb_a0, tb_a1, tb_a2, tb_y0, tb_y1, tb_y2              : UNSIGNED(7 DOWNTO 0);
   SIGNAL tb_w0, tb_w1, tb_w2                                   : UNSIGNED(7 DOWNTO 0);
+  SIGNAL tb_collect_matrix                                     : STD_LOGIC;
 
   BEGIN
 
   DUT : MMU
-  PORT MAP(clk => tb_clock, reset => tb_reset, hard_reset => tb_hard_reset, ld => tb_ld, ld_w => tb_ld_w, stall => tb_stall, a0 => tb_a0, a1 => tb_a1, a2 => tb_a2, w0 => tb_w0, w1 => tb_w1, w2 => tb_w2, y0 => tb_y0, y1 => tb_y1, y2 => tb_y2);
+  PORT MAP(clk => tb_clock, reset => tb_reset, hard_reset => tb_hard_reset, ld => tb_ld, ld_w => tb_ld_w, stall => tb_stall, a0 => tb_a0, a1 => tb_a1, a2 => tb_a2, w0 => tb_w0, w1 => tb_w1, w2 => tb_w2, y0 => tb_y0, y1 => tb_y1, y2 => tb_y2, collect_matrix => tb_collect_matrix);
 
   tb_clock <= NOT tb_clock AFTER HALF_PERIOD;
 
