@@ -1,3 +1,4 @@
+
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.all;
 USE ieee.numeric_std.all;
@@ -10,10 +11,10 @@ ARCHITECTURE test of tb_Tensor_Processing_Unit IS
 
 COMPONENT Tensor_Processing_Unit IS
 PORT(clk, reset, hard_reset, setup, GO  : IN STD_LOGIC;
-     stall                             : IN STD_LOGIC := '0';
-     weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
-	   done 						                 : OUT STD_LOGIC;
-     y0, y1, y2                        : OUT bus_width);
+   stall                             : IN STD_LOGIC := '0';
+   weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
+   done 						                 : OUT STD_LOGIC;
+   y0, y1, y2                        : OUT bus_width);
 END COMPONENT;
 
 CONSTANT HALF_PERIOD                                                 : time := 10 ns;

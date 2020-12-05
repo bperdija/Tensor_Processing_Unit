@@ -68,7 +68,7 @@ BEGIN
        next_state <= idle;
 
 
-   ELSE   -- If ld_w = 1
+   ELSIF (ld_w = '1') THEN   -- If ld_w = 1
      sig_ld <= '0';
 
      CASE current_state IS
@@ -98,6 +98,9 @@ BEGIN
          ld_col2 <= '0';
          next_state <= idle;
        END CASE;
+
+    ELSE
+      next_state <= idle;
      END IF;
    END PROCESS;
 
