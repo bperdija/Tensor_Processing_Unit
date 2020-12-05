@@ -98,10 +98,7 @@ BEGIN
          ld_col2 <= '0';
          next_state <= idle;
        END CASE;
-
-    ELSE
-      next_state <= idle;
-     END IF;
+    END IF;
    END PROCESS;
 
    PROCESS(clk, hard_reset, reset)

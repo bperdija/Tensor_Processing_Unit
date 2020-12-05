@@ -58,6 +58,11 @@ tb_weights <= "000001110000100000001001"; -- WRAM element 2
 tb_a_in <= "000000110000011000001001"; -- URAM 2
 wait for 20 ns;
 
+tb_GO <= '1';
+tb_setup <= '0';
+tb_weights <= "000000000000000000000000"; -- WRAM element 2
+tb_a_in <= "000000000000000000000000"; -- URAM 2
+wait for 800 ns;
 
 END PROCESS;
 end test;
