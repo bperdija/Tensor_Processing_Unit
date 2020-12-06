@@ -3,16 +3,15 @@ USE IEEE.STD_LOGIC_1164.all;
 USE ieee.numeric_std.ALL;
 USE ieee.std_logic_unsigned.ALL;
 
---testbench entities are always empty
 ENTITY tb_processing_element  IS
 END tb_processing_element;
 
 ARCHITECTURE behaviour of tb_processing_element IS
 
 COMPONENT processing_element is
-		PORT(clk, reset, hard_reset, ld, ld_w     : IN STD_LOGIC;
-		     w_in, a_in, part_in                  : IN UNSIGNED(7 DOWNTO 0);
-         partial_sum, a_out                   : OUT UNSIGNED(7 DOWNTO 0));
+	PORT(clk, reset, hard_reset, ld, ld_w     : IN STD_LOGIC := '0';
+			 w_in, a_in, part_in                  : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+			 partial_sum,  a_out                  : OUT UNSIGNED(7 DOWNTO 0) := (others => '0'));
 END COMPONENT;
 
   CONSTANT HALF_PERIOD : time := 10 ns;
@@ -28,12 +27,11 @@ END COMPONENT;
 
   PROCESS
   BEGIN
-    wait for 5 ns;
 
-    -- everything should be 0
-    tb_hard_reset <= '1';
-    tb_reset <= '0';
-    wait for 20 ns;
+		-- everything should be 0
+		tb_hard_reset <= '1';
+		tb_reset <= '0';
+    wait for 5 ns;
 
     -- partial_sum should be 0
     tb_hard_reset <= '0';

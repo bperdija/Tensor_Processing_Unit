@@ -10,11 +10,12 @@ END tb_Tensor_Processing_Unit;
 ARCHITECTURE test of tb_Tensor_Processing_Unit IS
 
 COMPONENT Tensor_Processing_Unit IS
-PORT(clk, reset, hard_reset, setup, GO  : IN STD_LOGIC;
-   stall                             : IN STD_LOGIC := '0';
-   weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
-   done 						                 : OUT STD_LOGIC;
-   y0, y1, y2                        : OUT bus_width);
+PORT(clk, reset, hard_reset, setup     : IN STD_LOGIC := '0';
+     GO                                : IN STD_LOGIC := '0';
+     stall                             : IN STD_LOGIC := '0';
+     weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0) := (others => '0');
+	   done 						                 : OUT STD_LOGIC := '0';
+     y0, y1, y2                        : OUT bus_width);
 END COMPONENT;
 
 CONSTANT HALF_PERIOD                                                 : time := 10 ns;

@@ -41,27 +41,38 @@ END COMPONENT;
     tb_data <= "000000000000000000000001";
     tb_rden <= '0';
     tb_wren <= '1';
-    wait for 100 ns;
+    wait for 40 ns;
 
-   tb_address <= "00";
+    -- give 2 clock cycles to read
+    tb_address <= "00";
     tb_data <= "000000000000000000000001";
-   tb_rden <= '1';
+    tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 
+    -- give 1 clock cycle to write
     tb_address <= "01";
     tb_data <= "000000000000000000000100";
     tb_rden <= '0';
     tb_wren <= '1';
     wait for 20 ns;
 
-   tb_address <= "01";
-   tb_rden <= '1';
+    -- give 2 clock cycles to read
+    tb_address <= "01";
+    tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 
-   tb_address <= "00";
-   tb_rden <= '1';
+    tb_address <= "00";
+    tb_rden <= '1';
+    tb_wren <= '0';
+    wait for 40 ns;
+
+    -- test aclr
+    tb_aclr <= '1';
+    tb_address <= "01";
+    tb_data <= "000000000000000000000001";
+    tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 

@@ -4,29 +4,28 @@ USE ieee.numeric_std.all;
 USE work.systolic_package.all;
 
 ENTITY Activation_Unit IS
-PORT(clk,reset, hard_reset, GO_store_matrix  : IN STD_LOGIC;
+PORT(clk,reset, hard_reset, GO_store_matrix  : IN STD_LOGIC := '0'; -- GO_store_matrix a signal that will come from MMU telling the AU when to start storing the input values for the final output matrix
      stall                                   : IN STD_LOGIC := '0';
-     y_in0, y_in1, y_in2                     : IN UNSIGNED(7 DOWNTO 0);
-	   done 						                       : OUT STD_LOGIC;
+     y_in0, y_in1, y_in2                     : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+	   done 						                       : OUT STD_LOGIC := '0';
      row0, row1, row2                        : OUT bus_width);
 END Activation_Unit;
 
--- Will we always reset?
 ARCHITECTURE behaviour OF Activation_Unit IS
 
 TYPE state_type is (state_0, state_1, state_2, state_3, state_4, state_5);
-SIGNAL next_state : state_type;
+SIGNAL next_state                                  : state_type;
 SIGNAL y11, y12, y13, y21, y22, y23, y31, y32, y33 : UNSIGNED(7 DOWNTO 0) := (others => '0');
-SIGNAL sig_done : STD_LOGIC;
+SIGNAL sig_done                                    : STD_LOGIC;
 
 BEGIN
   PROCESS(reset, hard_reset, clk)
   BEGIN
 
-    IF (reset = '1' OR hard_reset = '1') then
+    IF (reset = '1' OR hard_reset = '1') then -- if at reset return to state 0 so all stored matrix elements will be overwritten with new matrix
       next_state <= state_0;
 
-    ELSIF (GO_store_matrix = '1') THEN
+    ELSIF (GO_store_matrix = '1') THEN -- if at stall next state will be current state
       IF (stall = '1') then
           next_state <= next_state;
 
@@ -57,10 +56,9 @@ BEGIN
     END IF;
   END PROCESS;
 
-  PROCESS(next_state) --inputs would also go here
+  PROCESS(next_state)
   BEGIN
     CASE next_state IS
-    -- WHEN state0_0 OR state0_1
       WHEN state_0  =>
         IF (sig_done = '1') THEN
           row0(0) <= y11;

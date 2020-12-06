@@ -4,9 +4,9 @@ USE ieee.numeric_std.all;
 --USE work.systolic_package.all;
 
 Entity processing_element is
-		PORT(clk, reset, hard_reset, ld, ld_w     : IN STD_LOGIC;
-		     w_in, a_in, part_in                  : IN UNSIGNED(7 DOWNTO 0);
-         partial_sum,  a_out                  : OUT UNSIGNED(7 DOWNTO 0));
+		PORT(clk, reset, hard_reset, ld, ld_w     : IN STD_LOGIC := '0';
+		     w_in, a_in, part_in                  : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+         partial_sum,  a_out                  : OUT UNSIGNED(7 DOWNTO 0) := (others => '0'));
 END processing_element;
 
 ARCHITECTURE Behaviour of processing_element is

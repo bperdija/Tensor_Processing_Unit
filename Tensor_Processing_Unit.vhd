@@ -7,12 +7,11 @@ ENTITY Tensor_Processing_Unit IS
 PORT(clk, reset, hard_reset, setup     : IN STD_LOGIC := '0';
      GO                                : IN STD_LOGIC := '0';
      stall                             : IN STD_LOGIC := '0';
-     weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
+     weights, a_in                     : IN STD_LOGIC_VECTOR(23 DOWNTO 0) := (others => '0');
 	   done 						                 : OUT STD_LOGIC := '0';
      y0, y1, y2                        : OUT bus_width);
 END Tensor_Processing_Unit;
 
--- Will we always reset?
 ARCHITECTURE behaviour OF Tensor_Processing_Unit IS
 
 COMPONENT WRAM IS
@@ -36,31 +35,31 @@ COMPONENT URAM IS
 END COMPONENT;
 
 COMPONENT MMU IS
-PORT(clk, reset, hard_reset, ld, ld_w, stall  	  : IN STD_LOGIC;
-     a0, a1, a2                                   : IN UNSIGNED(7 DOWNTO 0);
-     w0, w1, w2                                   : IN UNSIGNED(7 DOWNTO 0);
-	   y0, y1, y2 				                          : OUT UNSIGNED(7 DOWNTO 0);
-     collect_matrix                               : OUT STD_LOGIC);
+PORT(clk, reset, hard_reset, ld, ld_w, stall  	  : IN STD_LOGIC := '0';
+     a0, a1, a2                                   : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+     w0, w1, w2                                   : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+	   y0, y1, y2 				                          : OUT UNSIGNED(7 DOWNTO 0) := (others => '0');
+     collect_matrix                               : OUT STD_LOGIC := '0');
 END COMPONENT;
 
 COMPONENT Activation_Unit IS
-PORT(clk, reset, hard_reset, GO_store_matrix  : IN STD_LOGIC;
-     stall                  : IN STD_LOGIC := '0';
-     y_in0, y_in1, y_in2    : IN UNSIGNED(7 DOWNTO 0);
-	   done 						      : OUT STD_LOGIC;
-     row0, row1, row2       : OUT bus_width);
+PORT(clk,reset, hard_reset, GO_store_matrix  : IN STD_LOGIC := '0'; 
+     stall                                   : IN STD_LOGIC := '0';
+     y_in0, y_in1, y_in2                     : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
+	   done 						                       : OUT STD_LOGIC := '0';
+     row0, row1, row2                        : OUT bus_width);
 END COMPONENT;
 
 TYPE state_type is (idle, load_row0, load_row1, load_row2); -- setup
-TYPE state_type1 is (idle1, load_row0_1, load_row1_1, load_row2_1, stall_readW1, stall_readW2); -- Go part1
-TYPE state_type2 is (idle2, load_a1, load_a2, load_a3, load_a4, load_a5, stall_readU1, stall_readU2); -- Go part2
-SIGNAL next_state, current_state                               : state_type; -- next_state and current_state are used for the setup and go, while next_state2 and current_state2 are used fortje computation + activation at the MMU
-SIGNAL next_state1, current_state1                             : state_type1;
-SIGNAL next_state2, current_state2                             : state_type2;
-SIGNAL any_reset, store_matrix, weight_ld, a_ld, GO_1, GO_2   : STD_LOGIC := '0';
+TYPE state_type1 is (idle1, load_row0_1, load_row1_1, load_row2_1, stall_readW1, stall_readW2); -- Go part1 (load W)
+TYPE state_type2 is (idle2, load_a1, load_a2, load_a3, load_a4, load_a5, stall_readU1, stall_readU2); -- Go part2 (load U)
+SIGNAL next_state, current_state                               : state_type; -- setup
+SIGNAL next_state1, current_state1                             : state_type1; -- GO part1 (load W)
+SIGNAL next_state2, current_state2                             : state_type2; -- GO part2 (load U)
+SIGNAL any_reset, store_matrix, weight_ld, a_ld, GO_1, GO_2    : STD_LOGIC := '0';
 SIGNAL W_out                                                   : STD_LOGIC_VECTOR(23 DOWNTO 0);
 SIGNAL W_out0, W_out1, W_out2                                  : UNSIGNED(7 DOWNTO 0);
-SIGNAL element_address0, element_address1, element_address2    : STD_LOGIC_VECTOR(1 DOWNTO 0);
+SIGNAL element_address0, element_address1, element_address2    : STD_LOGIC_VECTOR(1 DOWNTO 0) := (others => '0');
 SIGNAL a0, a1, a2, a_in0, a_in1, a_in2                         : STD_LOGIC_VECTOR(7 DOWNTO 0) := (others => '0');
 SIGNAL MMU_y0, MMU_y1, MMU_y2, a0_uns, a1_uns, a2_uns          : UNSIGNED(7 DOWNTO 0) := (others => '0');
 
@@ -69,7 +68,7 @@ BEGIN
   -- setup mode
   PROCESS(current_state, current_state1, current_state2, setup, GO)
   BEGIN
-    IF (setup = '1') THEN -- fail safe
+    IF (setup = '1') THEN -- if in setup mode go through following FSM
       CASE current_state IS
         WHEN idle =>
           element_address0 <= "01"; -- used for WRAM row and URAM
@@ -98,11 +97,11 @@ BEGIN
         END CASE;
 
     ELSIF (GO = '1') THEN
-       IF (GO_2 = '0') THEN
-          CASE current_state1 IS -- GO part 1
+       IF (GO_2 = '0' OR GO_1 = '1') THEN -- if at start of GO mode go through following FSM
+          CASE current_state1 IS -- GO part 1 (load W)
             WHEN idle1 =>
               GO_1 <= '1';
-              element_address0 <= "01"; -- used for WRAM row and URAM
+              element_address0 <= "01"; -- addresses used for both WRAM row and URAM
               element_address1 <= "01";
               element_address2 <= "01";
               next_state1 <= load_row0_1;
@@ -114,31 +113,32 @@ BEGIN
               next_state1 <= load_row1_1;
 
             WHEN load_row1_1 =>
-              weight_ld <= '1'; -- THIS HAS BEEN MOVED ;)
+              weight_ld <= '1';
               element_address0 <= "11";
               element_address1 <= "11";
               element_address2 <= "11";
+              GO_2 <= '1';
               next_state1 <= load_row2_1;
 
-            -- Set all control and weight buffers to 0 for the next cycle once the FSM returns to Idle.
             WHEN load_row2_1 =>
-              element_address0 <= "00"; -- ?????????????????????????
+              element_address0 <= "00";
               element_address1 <= "00";
               element_address2 <= "00";
               next_state1 <= stall_readW1;
 
+              -- go through stall states to properly align reading into MMU considering it takes two clocks to read from the WRAM
               WHEN stall_readW1 =>
                 next_state1 <= stall_readW2;
 
               WHEN stall_readW2 =>
                 weight_ld <= '0';
                 GO_1 <= '0';
-                GO_2 <= '1';
                 next_state1 <= idle1;
           END CASE;
+        END IF;
 
-      ELSE -- GO_2 = '1'
-          CASE current_state2 IS -- Go part 2
+      IF (GO_2 = '1') THEN -- if in GO mode and W has been requested to read start following FSM
+          CASE current_state2 IS -- Go part 2 (load U)
             WHEN idle2 =>
               element_address0 <= "01" ;
               element_address1 <= "00";
@@ -176,6 +176,7 @@ BEGIN
               element_address2 <= "00";
               next_state2 <= stall_readU1;
 
+            -- go through stall states to properly align reading into MMU considering it takes two clocks to read from the URAM
             WHEN stall_readU1 =>
               next_state2 <= stall_readU2;
 
@@ -197,7 +198,6 @@ BEGIN
           current_state1 <= idle1;
         END IF;
           current_state2 <= idle2;
-          done <= '0';
 
       ELSIF (GO = '1' AND stall = '1') THEN
         current_state <= next_state;

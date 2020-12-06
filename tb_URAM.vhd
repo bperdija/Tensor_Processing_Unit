@@ -43,69 +43,39 @@ END COMPONENT;
     tb_wren <= '1';
     wait for 100 ns;
 
-	 tb_address <= "00";
+    -- give 2 clock cycles to read
+	  tb_address <= "00";
     tb_data <= "00000001";
-	 tb_rden <= '1';
+	  tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 
+    -- give 1 clock cycle1 to write
     tb_address <= "01";
     tb_data <= "00000100";
     tb_rden <= '0';
     tb_wren <= '1';
     wait for 20 ns;
 
-	 tb_address <= "01";
-    --tb_data <= "00000001";
-	 tb_rden <= '1';
+    -- give 2 clock cycles to read
+	  tb_address <= "01";
+	  tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 
-	 tb_address <= "00";
-    --tb_data <= "00000001";
-	 tb_rden <= '1';
+    -- give 2 clock cycles to read
+	  tb_address <= "00";
+	  tb_rden <= '1';
     tb_wren <= '0';
     wait for 40 ns;
 
-
---    tb_address <= "11";
---    tb_data <= "10000000";
---    tb_rden <= '1';
---    tb_wren <= '0';
---    wait for 20 ns;
---
---    tb_address <= "11";
---    tb_data <= "10000000";
---    wait for 20 ns;
---
---    tb_address <= "11";
---    tb_data <= "10000000";
---    wait for 20 ns;
---
---    tb_address <= "11";
---    tb_data <= "10000000";
---    wait for 20 ns;
---
---    tb_address <= "00";
---    tb_data <= "00000010";
---    tb_rden <= '0';
---    tb_wren <= '1';
---    wait for 20 ns;
---
---    tb_address <= "00";
---    tb_data <= "00000010";
---    tb_rden <= '0';
---    tb_wren <= '1';
---    wait for 20 ns;
-
-    --tb_aclr <= '0';
-  --  tb_address <= "11";
-  --  tb_data <= "00001100";
-  --  wait for 20 ns;
-
-    --tb_address <= "00";
-    --tb_data <= "00000001";
-    --wait for 20 ns;
+    -- test aclr
+    tb_aclr <= '1';
+    tb_address <= "01";
+    tb_data <= "00000001";
+    tb_rden <= '1';
+    tb_wren <= '0';
+    wait for 40 ns;
 
   END PROCESS;
 END test;
