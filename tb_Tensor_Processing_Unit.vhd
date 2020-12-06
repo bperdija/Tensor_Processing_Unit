@@ -4,6 +4,8 @@ USE IEEE.STD_LOGIC_1164.all;
 USE ieee.numeric_std.all;
 USE work.systolic_package.all;
 
+-- this test bench tests the regular functionality of the STPU and output of the correct matrix
+
 ENTITY tb_Tensor_Processing_Unit IS
 END tb_Tensor_Processing_Unit;
 
@@ -42,7 +44,7 @@ BEGIN
 tb_hard_reset <= '1';
 tb_reset <= '1';
 tb_stall <= '0';
-wait for 5 ns;
+wait for 15 ns;
 
 tb_setup <= '1';
 tb_hard_reset <= '0';
@@ -63,7 +65,12 @@ tb_GO <= '1';
 tb_setup <= '0';
 tb_weights <= "000000000000000000000000"; -- WRAM element 2
 tb_a_in <= "000000000000000000000000"; -- URAM 2
-wait for 800 ns;
+wait for 360 ns;
+
+-- ANWSER:
+--  30   36   42
+--  66   81   96
+-- 102  126  150
 
 END PROCESS;
 end test;

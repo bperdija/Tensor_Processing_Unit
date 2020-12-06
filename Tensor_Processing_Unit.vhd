@@ -43,7 +43,7 @@ PORT(clk, reset, hard_reset, ld, ld_w, stall  	  : IN STD_LOGIC := '0';
 END COMPONENT;
 
 COMPONENT Activation_Unit IS
-PORT(clk,reset, hard_reset, GO_store_matrix  : IN STD_LOGIC := '0'; 
+PORT(clk,reset, hard_reset, GO_store_matrix  : IN STD_LOGIC := '0';
      stall                                   : IN STD_LOGIC := '0';
      y_in0, y_in1, y_in2                     : IN UNSIGNED(7 DOWNTO 0) := (others => '0');
 	   done 						                       : OUT STD_LOGIC := '0';
@@ -223,9 +223,9 @@ BEGIN
     URAM2 : URAM PORT MAP(aclr => any_reset, address => element_address1, clock => clk, data => a_in1, rden => GO_2, wren => setup, q => a1);
     URAM3 : URAM PORT MAP(aclr => any_reset, address => element_address2, clock => clk, data => a_in2, rden => GO_2, wren => setup, q => a2);
 
-    a0_uns <= UNSIGNED(a0);
-    a1_uns <= UNSIGNED(a0);
-    a2_uns <= UNSIGNED(a0);
+    a0_uns <= UNSIGNED(a0); -- Massive bug was fixed here on 12/6/2020 by the great Laura Floodster
+    a1_uns <= UNSIGNED(a1);
+    a2_uns <= UNSIGNED(a2);
 
     W_out0 <= UNSIGNED(W_out(23 DOWNTO 16));
     W_out1 <= UNSIGNED(W_out(15 DOWNTO 8));
