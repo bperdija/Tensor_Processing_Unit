@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 --USE work.systolic_package.all;
+-- Go raptors
 
 Entity processing_element is
 		PORT(clk, reset, hard_reset, ld, ld_w     : IN STD_LOGIC := '0';
